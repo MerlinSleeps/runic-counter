@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   Minus, 
@@ -8,6 +8,13 @@ import {
   RefreshCw 
 } from 'lucide-react';
 
+function getFromStorage<T>(key: string, defaultValue: T): T {
+  const saved = localStorage.getItem(key);
+  if (saved) {
+    return JSON.parse(saved) as T;
+  }
+  return defaultValue;
+}
 
 export default function App() {
 
@@ -17,6 +24,14 @@ export default function App() {
   
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
+  useEffect(() => {
+    localStorage.setItem('runicCounterPlayerCount', JSON.stringify(playerCount));
+  }, [playerCount]);
+
+  useEffect(() => {
+    localStorage.setItem('runicCounterScores', JSON.stringify(scores));
+  }, [scores]);
+  
   const handleIncrement = (index: number) => {
     setScores(prevScores => 
       prevScores.map((score, i) => (i === index ? score + 1 : score))
@@ -36,7 +51,7 @@ export default function App() {
 
   const handleSetPlayerCount = (count: number) => {
     setPlayerCount(count);
-    handleResetGame(); // Reset scores when player count changes
+    handleResetGame();
     setShowSettings(false);
   };
 
