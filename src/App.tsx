@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Plus, 
   Minus, 
@@ -18,9 +18,13 @@ function getFromStorage<T>(key: string, defaultValue: T): T {
 
 export default function App() {
 
-  const [playerCount, setPlayerCount] = useState<number>(2);
+  const [playerCount, setPlayerCount] = useState<number>(() => 
+    getFromStorage('runicCounterPlayerCount', 2)
+  );
   
-  const [scores, setScores] = useState<number[]>([0, 0, 0, 0]);
+  const [scores, setScores] = useState<number[]>(() => 
+    getFromStorage('runicCounterScores', [0, 0, 0, 0])
+  );
   
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
