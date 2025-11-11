@@ -8,11 +8,30 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+      colors: {
+        'arcane-dark': '#0A1428',
+        'arcane-plate': '#1A2E4F',
+        'arcane-gold': '#C89B3C',
+        'hextech-blue': '#00BFFF',
       },
+      fontFamily: {
+        arcane: ['Arcane Nine', 'sans-serif']
+      },
+      textShadow: {
+        'glow-blue': '0 0 10px #00BFFF, 0 0 20px #00BFFF', // font-blue
+        'glow-gold': '0 0 8px #C89B3C', // font-gold
+      },
+      boxShadow: {
+        'glow-blue': '0 0 20px 8px rgba(0, 191, 255, 0.4)', // hextech-blue
+        'glow-gold': '0 0 15px 5px rgba(200, 155, 60, 0.3)', // arcane-gold
+      },
+      backgroundImage: {
+        'gradient-arcane': 'radial-gradient(circle at center, #1A2E4F 30%, #0A1428 100%)',
+      }
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss-textshadow')
+  ],
 }
 
