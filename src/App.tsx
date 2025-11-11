@@ -27,6 +27,8 @@ export default function App() {
     getFromStorage('runicCounterScores', [0, 0, 0, 0])
   );
   
+  const isGameInWinningState = scores.some(score => score >= 8);
+
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
   useEffect(() => {
@@ -154,18 +156,30 @@ return (
         ))}
       </div>
 
-      <button
-        onClick={() => setShowSettings(true)}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 
-                   bg-arcane-plate text-arcane-gold
-                   clip-[polygon(25%_0%,_75%_0%,_100%_50%,_75%_100%,_25%_100%,_0%_50%)]
-                   border border-arcane-gold/50 shadow-glow-gold
-                   hover:text-hextech-blue hover:shadow-glow-blue hover:border-hextech-blue
-                   transition-all duration-200 z-10"
-        aria-label="Open Settings"
-      >
-        <Settings size={28} />
-      </button>
+      <div
+        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+                   p-0.5 
+                   btn-octagon 
+                   transition-all duration-200 z-10
+                   ${isGameInWinningState 
+                     ? 'bg-hextech-blue shadow-glow-blue' 
+                     : 'bg-arcane-gold shadow-glow-gold hover:bg-hextech-blue hover:shadow-glow-blue'
+                   }`}>
+        <button
+          onClick={() => setShowSettings(true)}
+          className={`p-3 
+                     bg-arcane-plate 
+                     btn-octagon 
+                     transition-all duration-200
+                     ${isGameInWinningState 
+                       ? 'text-hextech-blue' 
+                       : 'text-arcane-gold hover:text-hextech-blue'
+                     }`}
+          aria-label="Open Settings"
+        >
+          <Settings size={28} />
+        </button>
+      </div>
 
       {showSettings && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">

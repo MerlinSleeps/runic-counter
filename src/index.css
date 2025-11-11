@@ -5,10 +5,16 @@
   font-style: normal;
 }
 
+.btn-octagon {
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+}
+
 body {
   background-color: #0A1428;
   background-image: radial-gradient(circle at center, #1A2E4F 30%, #0A1428 100%);
 }
+
+
 
 @tailwind base;
 @tailwind components;
