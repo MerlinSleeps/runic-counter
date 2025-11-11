@@ -157,7 +157,8 @@ return (
       </div>
 
       <div
-        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+        className={`absolute 
+                   ${playerCount === 1 ? 'top-4 right-4' : 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'}
                    p-0.5 
                    btn-octagon 
                    transition-all duration-200 z-10
