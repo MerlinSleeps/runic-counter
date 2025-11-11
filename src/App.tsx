@@ -6,8 +6,20 @@ import {
   Settings, 
   X, 
   Users, 
-  RefreshCw 
+  RefreshCw,
+  Gem 
 } from 'lucide-react';
+
+const RUNE_DATA = {
+  Fury: 'text-red-500',
+  Calm: 'text-green-500',
+  Body: 'text-orange-500',
+  Order: 'text-yellow-400',
+  Mind: 'text-blue-400',
+  Chaos: 'text-purple-500',
+};
+
+const RUNE_NAMES = Object.keys(RUNE_DATA);
 
 function getFromStorage<T>(key: string, defaultValue: T): T {
   const saved = localStorage.getItem(key);
@@ -30,6 +42,10 @@ export default function App() {
   const isGameInWinningState = scores.some(score => score >= 8);
 
   const [showSettings, setShowSettings] = useState<boolean>(false);
+
+  const [playerRunes, setPlayerRunes] = useState<string[][]>([[], [], [], []]);
+
+  const [showRuneModalFor, setShowRuneModalFor] = useState<number | null>(null);
 
   useEffect(() => {
     localStorage.setItem('runicCounterPlayerCount', JSON.stringify(playerCount));
@@ -104,9 +120,12 @@ return (
         {scores.slice(0, playerCount).map((score, index) => (
           <div key={index} className={getPlayerClass(index)}>
             
-            <span className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase">
+            <button 
+              onClick={() => setShowRuneModalFor(index)}
+              className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase
+                        hover:text-hextech-blue transition-colors duration-200">
               Player {index + 1}
-            </span>
+            </button>
             
             <AnimatePresence mode="wait">
               <motion.span
@@ -117,7 +136,7 @@ return (
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.2 }}
 
-                className={`font-sans font-black text-8xl md:text-9xl ${
+                className={`font-arcane font-black text-8xl md:text-9xl ${
                   score >= 8
                     ? 'text-hextech-blue text-shadow-glow-blue' // Winning glow
                     : 'text-arcane-gold text-shadow-glow-gold' // Base score glow
@@ -127,6 +146,16 @@ return (
               </motion.span>
             </AnimatePresence>
             
+            <div className="absolute top-4 left-4 flex gap-2">
+                  {playerRunes[index].map((runeName) => (
+                    <Gem 
+                      key={runeName} 
+                      className={`w-6 h-6 ${RUNE_DATA[runeName as keyof typeof RUNE_DATA]} opacity-80`} 
+                      strokeWidth={3} 
+                    />
+                  ))}
+                </div>
+
             <div className="flex gap-4 md:gap-8">
               <button
                 onClick={() => handleDecrement(index)}
@@ -237,6 +266,79 @@ return (
                   <RefreshCw size={20} />
                   Reset Game
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRuneModalFor !== null && (
+        <div 
+          // This is the background overlay
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowRuneModalFor(null)} // Close modal on background click
+        >
+          <div 
+            // This is the modal content. We stop the background click from closing it.
+            className="bg-arcane-plate rounded-2xl shadow-xl w-full max-w-sm 
+                       border-2 border-arcane-gold/50 overflow-hidden"
+            onClick={(e) => e.stopPropagation()} // Prevents modal from closing when clicking inside it
+          >
+            {/* --- Modal Header --- */}
+            <div className="flex justify-between items-center p-5 border-b border-arcane-gold/20">
+              <h2 className="text-2xl font-bold text-white">Player {showRuneModalFor + 1} Runes</h2>
+              <button
+                onClick={() => setShowRuneModalFor(null)}
+                className="p-2 rounded-lg text-gray-400 hover:bg-arcane-dark hover:text-white"
+                aria-label="Close Rune Selector"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* --- Modal Body (Rune Grid) --- */}
+            <div className="p-5">
+              <label className="block text-sm font-medium text-arcane-gold mb-3">
+                Select exactly 2 runes:
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                {RUNE_NAMES.map((runeName) => {
+                  const isSelected = playerRunes[showRuneModalFor].includes(runeName);
+                  const canSelect = playerRunes[showRuneModalFor].length < 2;
+
+                  return (
+                    <button
+                      key={runeName}
+                      onClick={() => {
+                        // This logic handles selection/deselection and the 2-rune limit
+                        setPlayerRunes(currentRunes => {
+                          const newRunes = [...currentRunes];
+                          const runesForThisPlayer = newRunes[showRuneModalFor];
+
+                          if (isSelected) {
+                            // De-select: Remove it
+                            newRunes[showRuneModalFor] = runesForThisPlayer.filter(r => r !== runeName);
+                          } else if (canSelect) {
+                            // Select: Add it
+                            newRunes[showRuneModalFor] = [...runesForThisPlayer, runeName];
+                          }
+                          // If 2 are already selected and not de-selecting, do nothing.
+                          return newRunes;
+                        });
+                      }}
+                      className={`p-4 rounded-lg font-arcane text-lg font-bold transition-all duration-200
+                                  border ${RUNE_DATA[runeName as keyof typeof RUNE_DATA]}
+                                  ${isSelected
+                                    ? 'bg-arcane-gold/20 border-arcane-gold text-shadow-glow-gold' // Selected state
+                                    : 'bg-arcane-dark border-arcane-gold/30 opacity-70 hover:opacity-100' // Default state
+                                  }
+                                  ${!isSelected && !canSelect && 'opacity-30 cursor-not-allowed'} // Disabled state
+                                `}
+                    >
+                      {runeName}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
