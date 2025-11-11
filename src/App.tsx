@@ -156,10 +156,12 @@ return (
 
       <button
         onClick={() => setShowSettings(true)}
-        className="absolute top-4 right-4 p-3 bg-arcane-plate/80 text-arcane-gold
-                  clip-[polygon(0%_15%,_15%_0%,_85%_0%,_100%_15%,_100%_85%,_85%_100%,_15%_100%,_0%_85%)]
-                  border border-arcane-gold/30 hover:bg-arcane-plate shadow-glow-gold
-                  hover:text-hextech-blue transition-all duration-200 z-10"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 
+                   bg-arcane-plate text-arcane-gold
+                   clip-[polygon(25%_0%,_75%_0%,_100%_50%,_75%_100%,_25%_100%,_0%_50%)]
+                   border border-arcane-gold/50 shadow-glow-gold
+                   hover:text-hextech-blue hover:shadow-glow-blue hover:border-hextech-blue
+                   transition-all duration-200 z-10"
         aria-label="Open Settings"
       >
         <Settings size={28} />

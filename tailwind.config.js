@@ -26,7 +26,7 @@ export default {
         'glow-gold': '0 0 15px 5px rgba(200, 155, 60, 0.3)', // arcane-gold
       },
       backgroundImage: {
-        'gradient-arcane': 'radial-gradient(circle at center, #1A2E4F 30%, #0A1428 100%)',
+        'gradient-arcane': 'radial-gradient(circle at center, #0A1428 70%, #000000 100%)',
       }
     },
   },
