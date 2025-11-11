@@ -117,7 +117,7 @@ return (
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.2 }}
 
-                className={`font-sans font-black text-8xl md:text-9xl ${
+                className={`font-numeric font-black text-8xl md:text-9xl ${
                   score >= 8
                     ? 'text-hextech-blue text-shadow-glow-blue' // Winning glow
                     : 'text-arcane-gold text-shadow-glow-gold' // Base score glow

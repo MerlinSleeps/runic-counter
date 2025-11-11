@@ -15,7 +15,8 @@ export default {
         'hextech-blue': '#00BFFF',
       },
       fontFamily: {
-        arcane: ['Arcane Nine', 'sans-serif']
+        arcane: ['Arcane Nine', 'sans-serif'],
+        numeric: ['Arcane Nine', 'serif']
       },
       textShadow: {
         'glow-blue': '0 0 10px #00BFFF, 0 0 20px #00BFFF', // font-blue
