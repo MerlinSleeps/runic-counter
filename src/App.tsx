@@ -7,19 +7,51 @@ import {
   X, 
   Users, 
   RefreshCw,
-  Gem 
+  Ban 
 } from 'lucide-react';
 
 const RUNE_DATA = {
-  Fury: 'text-red-500',
-  Calm: 'text-green-500',
-  Body: 'text-orange-500',
-  Order: 'text-yellow-400',
-  Mind: 'text-blue-400',
-  Chaos: 'text-purple-500',
+  'Fury': {
+    color: 'text-rune-fury',
+    borderColor: 'border-rune-fury',
+    glow: 'drop-shadow-glow-fury',
+    icon: 'icons/runes/fury.jpg'
+  },
+  'Calm': {
+    color: 'text-rune-calm',
+    borderColor: 'border-rune-calm',
+    glow: 'drop-shadow-glow-calm',
+    icon: 'icons/runes/calm.jpg'
+  },
+  'Body': {
+    color: 'text-rune-body',
+    borderColor: 'border-rune-body',
+    glow: 'drop-shadow-glow-body',
+    icon: 'icons/runes/body.jpg'
+  },
+  'Order': {
+    color: 'text-rune-order',
+    borderColor: 'border-rune-order',
+    glow: 'drop-shadow-glow-order',
+    icon: 'icons/runes/order.jpg'
+  },
+  'Mind': {
+    color: 'text-rune-mind',
+    borderColor: 'border-rune-mind',
+    glow: 'drop-shadow-glow-mind',
+    icon: 'icons/runes/mind.jpg'
+  },
+  'Chaos': {
+    color: 'text-rune-chaos',
+    borderColor: 'border-rune-chaos',
+    glow: 'drop-shadow-glow-chaos',
+    icon: 'icons/runes/chaos.jpg'
+  },
 };
 
-const RUNE_NAMES = Object.keys(RUNE_DATA);
+type RuneName = keyof typeof RUNE_DATA;
+
+const RUNE_NAMES = Object.keys(RUNE_DATA) as RuneName[];
 
 function getFromStorage<T>(key: string, defaultValue: T): T {
   const saved = localStorage.getItem(key);
@@ -113,6 +145,33 @@ const getPlayerClass = (index: number) => {
     return classes;
   };
 
+  const handleRuneSelect = (runeName: RuneName) => {
+    if (showRuneModalFor === null) return;
+
+    setPlayerRunes(currentRunes => {
+      const newRunes = [...currentRunes];
+      const runesForThisPlayer = newRunes[showRuneModalFor];
+      const isSelected = runesForThisPlayer.includes(runeName);
+      const canSelect = runesForThisPlayer.length < 2;
+
+      if (isSelected) {
+        newRunes[showRuneModalFor] = runesForThisPlayer.filter(r => r !== runeName);
+      } else if (canSelect) {
+        newRunes[showRuneModalFor] = [...runesForThisPlayer, runeName];
+      }
+      return newRunes;
+    });
+  };
+
+  const handleClearRunes = () => {
+    if (showRuneModalFor === null) return;
+
+    setPlayerRunes(currentRunes => {
+      const newRunes = [...currentRunes];
+      newRunes[showRuneModalFor] = []; // Set runes to an empty array
+      return newRunes;
+    });
+  };
 
 return (
   <main className="fixed inset-0 text-arcane-gold font-arcane select-none bg-gradient-arcane">
@@ -147,14 +206,15 @@ return (
             </AnimatePresence>
             
             <div className="absolute top-4 left-4 flex gap-2">
-                  {playerRunes[index].map((runeName) => (
-                    <Gem 
-                      key={runeName} 
-                      className={`w-6 h-6 ${RUNE_DATA[runeName as keyof typeof RUNE_DATA]} opacity-80`} 
-                      strokeWidth={3} 
-                    />
-                  ))}
-                </div>
+              {playerRunes[index].map((runeName) => (
+                <img
+                  key={runeName}
+                  src={RUNE_DATA[runeName as keyof typeof RUNE_DATA].icon}
+                  alt={runeName}
+                  className={`w-8 h-8 rounded-md ${RUNE_DATA[runeName as keyof typeof RUNE_DATA].glow}`}
+                />
+              ))}
+            </div>
 
             <div className="flex gap-4 md:gap-8">
               <button
@@ -274,17 +334,14 @@ return (
 
       {showRuneModalFor !== null && (
         <div 
-          // This is the background overlay
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowRuneModalFor(null)} // Close modal on background click
+          onClick={() => setShowRuneModalFor(null)}
         >
           <div 
-            // This is the modal content. We stop the background click from closing it.
             className="bg-arcane-plate rounded-2xl shadow-xl w-full max-w-sm 
                        border-2 border-arcane-gold/50 overflow-hidden"
-            onClick={(e) => e.stopPropagation()} // Prevents modal from closing when clicking inside it
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* --- Modal Header --- */}
             <div className="flex justify-between items-center p-5 border-b border-arcane-gold/20">
               <h2 className="text-2xl font-bold text-white">Player {showRuneModalFor + 1} Runes</h2>
               <button
@@ -296,50 +353,71 @@ return (
               </button>
             </div>
 
-            {/* --- Modal Body (Rune Grid) --- */}
+{/* --- Modal Body (Hex Grid) --- */}
             <div className="p-5">
-              <label className="block text-sm font-medium text-arcane-gold mb-3">
+              <label className="block text-center text-sm font-medium text-arcane-gold mb-4">
                 Select exactly 2 runes:
               </label>
-              <div className="grid grid-cols-3 gap-3">
-                {RUNE_NAMES.map((runeName) => {
-                  const isSelected = playerRunes[showRuneModalFor].includes(runeName);
-                  const canSelect = playerRunes[showRuneModalFor].length < 2;
+              
+              {/* This is the helper function for a single Rune Button */}
+              {/* We define it here so we don't repeat code 6 times */}
+              {showRuneModalFor !== null && (() => {
+                const runesForThisPlayer = playerRunes[showRuneModalFor];
+                const canSelect = runesForThisPlayer.length < 2;
 
+                const RuneButton = ({ name }: { name: RuneName }) => {
+                  const isSelected = runesForThisPlayer.includes(name);
                   return (
                     <button
-                      key={runeName}
-                      onClick={() => {
-                        // This logic handles selection/deselection and the 2-rune limit
-                        setPlayerRunes(currentRunes => {
-                          const newRunes = [...currentRunes];
-                          const runesForThisPlayer = newRunes[showRuneModalFor];
-
-                          if (isSelected) {
-                            // De-select: Remove it
-                            newRunes[showRuneModalFor] = runesForThisPlayer.filter(r => r !== runeName);
-                          } else if (canSelect) {
-                            // Select: Add it
-                            newRunes[showRuneModalFor] = [...runesForThisPlayer, runeName];
-                          }
-                          // If 2 are already selected and not de-selecting, do nothing.
-                          return newRunes;
-                        });
-                      }}
-                      className={`p-4 rounded-lg font-arcane text-lg font-bold transition-all duration-200
-                                  border ${RUNE_DATA[runeName as keyof typeof RUNE_DATA]}
+                      onClick={() => handleRuneSelect(name)}
+                      className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg font-arcane text-sm font-bold transition-all duration-200
+                                  w-24 h-24
+                                  border ${RUNE_DATA[name].color}
                                   ${isSelected
-                                    ? 'bg-arcane-gold/20 border-arcane-gold text-shadow-glow-gold' // Selected state
-                                    : 'bg-arcane-dark border-arcane-gold/30 opacity-70 hover:opacity-100' // Default state
+                                    ? `bg-arcane-gold/20 ${RUNE_DATA[name].borderColor}`
+                                    : 'bg-arcane-dark border-arcane-gold/30 opacity-70 hover:opacity-100'
                                   }
-                                  ${!isSelected && !canSelect && 'opacity-30 cursor-not-allowed'} // Disabled state
+                                  ${!isSelected && !canSelect && 'opacity-30 cursor-not-allowed'}
                                 `}
                     >
-                      {runeName}
+                      <img
+                        src={RUNE_DATA[name].icon}
+                        alt={name}
+                        className={`w-10 h-10 rounded-md transition-all ${isSelected ? RUNE_DATA[name].glow : 'opacity-80'}`}
+                      />
+                      {name}
                     </button>
                   );
-                })}
-              </div>
+                };
+
+                return (
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="flex justify-center gap-3">
+                      <RuneButton name="Fury" />
+                      <RuneButton name="Calm" />
+                    </div>
+                    <div className="flex justify-center gap-3">
+                      <RuneButton name="Body" />
+                      <button
+                        onClick={handleClearRunes}
+                        className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg font-arcane text-sm font-bold transition-all duration-200
+                                    w-24 h-24
+                                    border border-arcane-gold/50 text-arcane-gold/70
+                                    bg-arcane-dark hover:opacity-100 hover:text-arcane-gold hover:border-arcane-gold`}
+                      >
+                        <Ban className="w-10 h-10 opacity-80" />
+                        Clear
+                      </button>
+
+                      <RuneButton name="Order" />
+                    </div>
+                    <div className="flex justify-center gap-3">
+                      <RuneButton name="Mind" />
+                      <RuneButton name="Chaos" />
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
