@@ -166,7 +166,7 @@ const getPlayerClass = (index: number) => {
 
     setPlayerRunes(currentRunes => {
       const newRunes = [...currentRunes];
-      newRunes[showRuneModalFor] = []; // Set runes to an empty array
+      newRunes[showRuneModalFor] = [];
       return newRunes;
     });
   };
@@ -207,7 +207,7 @@ return (
                   key={runeName}
                   src={RUNE_DATA[runeName as RuneName].icon}
                   alt={runeName}
-                  className={`w-8 h-8 rounded-md ${RUNE_DATA[runeName as RuneName].glow}`}
+                  className={`player-rune-icon ${RUNE_DATA[runeName as RuneName].glow}`}
                 />
               ))}
             </div>
