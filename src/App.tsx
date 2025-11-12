@@ -187,57 +187,48 @@ return (
             <AnimatePresence mode="wait">
               <motion.span
                 key={score}
-
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-
-                className={`font-arcane font-black text-8xl md:text-9xl ${
-                  score >= 8
-                    ? 'text-hextech-blue text-shadow-glow-blue' // Winning glow
-                    : 'text-arcane-gold text-shadow-glow-gold' // Base score glow
-                }`}
+                className={`player-score ${
+                              score >= 8
+                                ? 'text-hextech-blue text-shadow-glow-blue'
+                                : 'text-arcane-gold text-shadow-glow-gold'
+                            }`}
               >
                 {score}
               </motion.span>
             </AnimatePresence>
-            
+
             <div className="absolute top-4 left-4 flex gap-2">
               {playerRunes[index].map((runeName) => (
                 <img
                   key={runeName}
-                  src={RUNE_DATA[runeName as keyof typeof RUNE_DATA].icon}
+                  src={RUNE_DATA[runeName as RuneName].icon}
                   alt={runeName}
-                  className={`w-8 h-8 rounded-md ${RUNE_DATA[runeName as keyof typeof RUNE_DATA].glow}`}
+                  className={`w-8 h-8 rounded-md ${RUNE_DATA[runeName as RuneName].glow}`}
                 />
               ))}
             </div>
 
-            <div className="flex gap-4 md:gap-8">
+            <div className="flex gap-4 md:gap-8 landscape:gap-2">
               <button
                 onClick={() => handleDecrement(index)}
-                className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center
-                          clip-[polygon(0%_15%,_15%_0%,_85%_0%,_100%_15%,_100%_85%,_85%_100%,_15%_100%,_0%_85%)]
-                          bg-arcane-dark/50 text-arcane-gold/70 border-2 border-arcane-gold/30
-                          hover:bg-arcane-dark hover:border-arcane-gold/70 transition-all duration-200
-                          active:transform active:scale-90"
+                className="player-button"
                 aria-label={`Decrement Player ${index + 1} score`}
               >
-                <Minus size={48} />
+              <Minus className="player-button-icon" />
               </button>
 
               <button
                 onClick={() => handleIncrement(index)}
-                className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center
-                          clip-[polygon(0%_15%,_15%_0%,_85%_0%,_100%_15%,_100%_85%,_85%_100%,_15%_100%,_0%_85%)]
-                          bg-arcane-dark/50 text-arcane-gold/70 border-2 border-arcane-gold/30
-                          hover:bg-arcane-dark hover:border-arcane-gold/70 transition-all duration-200
-                          active:transform active:scale-90"
+                className="player-button"
                 aria-label={`Increment Player ${index + 1} score`}
               >
-                <Plus size={48} />
+              <Plus className="player-button-icon" />
               </button>
+
             </div>
           </div>
         ))}
@@ -255,17 +246,14 @@ return (
                    }`}>
         <button
           onClick={() => setShowSettings(true)}
-          className={`p-3 
-                     bg-arcane-plate 
-                     btn-octagon 
-                     transition-all duration-200
+          className={`settings-button
                      ${isGameInWinningState 
                        ? 'text-hextech-blue' 
                        : 'text-arcane-gold hover:text-hextech-blue'
                      }`}
           aria-label="Open Settings"
         >
-          <Settings size={28} />
+          <Settings className='settings-button-icon' />
         </button>
       </div>
 
@@ -351,14 +339,8 @@ return (
               </button>
             </div>
 
-{/* --- Modal Body (Hex Grid) --- */}
-            <div className="p-5">
-              <label className="block text-center text-sm font-medium text-arcane-gold mb-4">
-                Select exactly 2 runes:
-              </label>
-              
-              {/* This is the helper function for a single Rune Button */}
-              {/* We define it here so we don't repeat code 6 times */}
+            <div className="p-5 landscape:p-1">
+
               {showRuneModalFor !== null && (() => {
                 const runesForThisPlayer = playerRunes[showRuneModalFor];
                 const canSelect = runesForThisPlayer.length < 2;
