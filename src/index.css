@@ -1,22 +1,91 @@
-@font-face {
-  font-family: 'Arcane Nine';
-  src: url('/fonts/Arcane Nine.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-.btn-octagon {
-  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
-}
-
-body {
-  background-color: #0A1428;
-  background-image: radial-gradient(circle at center, #1A2E4F 30%, #0A1428 100%);
-}
-
-
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 @tailwind variants;
+
+@font-face {
+  font-family: 'Arcane Nine';
+  src: url('/fonts/ArcaneNine-Modded.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+@layer components {
+  body {
+  background-color: #0A1428;
+  background-image: radial-gradient(circle at center, #1A2E4F 30%, #0A1428 100%);
+}
+  /* --- 1. Player Score Text --- */
+  .player-score {
+    @apply font-arcane font-black transition-all duration-300
+    /* Default (Small Phone) */
+    text-6xl
+    /* Small Phone - Landscape */
+    landscape:text-5xl
+    /* Tablet (md) & up */
+    md:text-8xl
+    lg:text-9xl
+    landscape:lg:text-8xl;
+  }
+
+  .player-button {
+    /* Default (Small Phone) */
+    @apply w-12 h-12
+    /* Small Phone - Landscape */
+    landscape:w-16 landscape:h-16 
+    /* Tablet (md) & up */
+    md:w-20 md:h-20 md:border-2
+    /* Desktop (lg) & up */
+    lg:w-32 lg:h-32
+    landscape:lg:w-32 landscape:lg:h-20
+    landscape:lg:border-4
+    
+    flex items-center justify-center
+    landscape:border-0 landscape:bg-transparent
+    bg-transparent text-arcane-gold/80 border-2 border-arcane-gold/30
+    hover:text-hextech-blue hover:border-arcane-gold/70 transition-all duration-200
+    active:transform active:scale-90;
+  }
+
+  .player-button-icon {
+    @apply size-12
+    landscape:w-7 landscape:h-7 landscape:border-0 landscape:bg-transparent
+    md:w-12 md:h-12;
+  }
+
+  .settings-button {
+    @apply p-2
+    md:p-3
+    bg-arcane-plate btn-octagon transition-all duration-200;
+  }
+
+  .settings-icon {
+    @apply md:w-7 md:h-7;
+  }
+
+  .player-rune-icon {
+    @apply w-6 h-6 rounded-md
+           landscape:w-7 landscape:h-7
+           md:w-8 md:h-8
+           landscape:md:w-10 landscape:md:h-10
+           lg:w-10 lg:h-10
+           landscape:lg:w-12 landscape:lg:h-12;
+  }
+
+  .btn-octagon {
+    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  }
+
+  @media (max-height: 450px) {
+  .player-score {
+    @apply text-5xl;
+  }
+  .player-button {
+    @apply w-14 h-14 border-0;
+  }
+  .player-button-icon {
+    @apply w-7 h-7;
+  }
+}
+}

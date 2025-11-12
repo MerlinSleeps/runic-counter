@@ -6,8 +6,50 @@ import {
   Settings, 
   X, 
   Users, 
-  RefreshCw 
+  RefreshCw,
+  Ban 
 } from 'lucide-react';
+
+const RUNE_DATA = {
+  'Fury': {
+    color: 'text-rune-fury',
+    borderColor: 'border-rune-fury',
+    glow: 'drop-shadow-glow-fury',
+    icon: 'icons/runes/fury.jpg'
+  },
+  'Calm': {
+    color: 'text-rune-calm',
+    borderColor: 'border-rune-calm',
+    glow: 'drop-shadow-glow-calm',
+    icon: 'icons/runes/calm.jpg'
+  },
+  'Body': {
+    color: 'text-rune-body',
+    borderColor: 'border-rune-body',
+    glow: 'drop-shadow-glow-body',
+    icon: 'icons/runes/body.jpg'
+  },
+  'Order': {
+    color: 'text-rune-order',
+    borderColor: 'border-rune-order',
+    glow: 'drop-shadow-glow-order',
+    icon: 'icons/runes/order.jpg'
+  },
+  'Mind': {
+    color: 'text-rune-mind',
+    borderColor: 'border-rune-mind',
+    glow: 'drop-shadow-glow-mind',
+    icon: 'icons/runes/mind.jpg'
+  },
+  'Chaos': {
+    color: 'text-rune-chaos',
+    borderColor: 'border-rune-chaos',
+    glow: 'drop-shadow-glow-chaos',
+    icon: 'icons/runes/chaos.jpg'
+  },
+};
+
+type RuneName = keyof typeof RUNE_DATA;
 
 function getFromStorage<T>(key: string, defaultValue: T): T {
   const saved = localStorage.getItem(key);
@@ -30,6 +72,10 @@ export default function App() {
   const isGameInWinningState = scores.some(score => score >= 8);
 
   const [showSettings, setShowSettings] = useState<boolean>(false);
+
+  const [playerRunes, setPlayerRunes] = useState<string[][]>([[], [], [], []]);
+
+  const [showRuneModalFor, setShowRuneModalFor] = useState<number | null>(null);
 
   useEffect(() => {
     localStorage.setItem('runicCounterPlayerCount', JSON.stringify(playerCount));
@@ -97,6 +143,33 @@ const getPlayerClass = (index: number) => {
     return classes;
   };
 
+  const handleRuneSelect = (runeName: RuneName) => {
+    if (showRuneModalFor === null) return;
+
+    setPlayerRunes(currentRunes => {
+      const newRunes = [...currentRunes];
+      const runesForThisPlayer = newRunes[showRuneModalFor];
+      const isSelected = runesForThisPlayer.includes(runeName);
+      const canSelect = runesForThisPlayer.length < 2;
+
+      if (isSelected) {
+        newRunes[showRuneModalFor] = runesForThisPlayer.filter(r => r !== runeName);
+      } else if (canSelect) {
+        newRunes[showRuneModalFor] = [...runesForThisPlayer, runeName];
+      }
+      return newRunes;
+    });
+  };
+
+  const handleClearRunes = () => {
+    if (showRuneModalFor === null) return;
+
+    setPlayerRunes(currentRunes => {
+      const newRunes = [...currentRunes];
+      newRunes[showRuneModalFor] = [];
+      return newRunes;
+    });
+  };
 
 return (
   <main className="fixed inset-0 text-arcane-gold font-arcane select-none bg-gradient-arcane">
@@ -104,53 +177,58 @@ return (
         {scores.slice(0, playerCount).map((score, index) => (
           <div key={index} className={getPlayerClass(index)}>
             
-            <span className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase">
+            <button 
+              onClick={() => setShowRuneModalFor(index)}
+              className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase
+                        hover:text-hextech-blue transition-colors duration-200">
               Player {index + 1}
-            </span>
+            </button>
             
             <AnimatePresence mode="wait">
               <motion.span
                 key={score}
-
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-
-                className={`font-numeric font-black text-8xl md:text-9xl ${
-                  score >= 8
-                    ? 'text-hextech-blue text-shadow-glow-blue' // Winning glow
-                    : 'text-arcane-gold text-shadow-glow-gold' // Base score glow
-                }`}
+                className={`player-score ${
+                              score >= 8
+                                ? 'text-hextech-blue text-shadow-glow-blue'
+                                : 'text-arcane-gold text-shadow-glow-gold'
+                            }`}
               >
                 {score}
               </motion.span>
             </AnimatePresence>
-            
-            <div className="flex gap-4 md:gap-8">
+
+            <div className="absolute top-4 left-4 flex gap-2">
+              {playerRunes[index].map((runeName) => (
+                <img
+                  key={runeName}
+                  src={RUNE_DATA[runeName as RuneName].icon}
+                  alt={runeName}
+                  className={`player-rune-icon ${RUNE_DATA[runeName as RuneName].glow}`}
+                />
+              ))}
+            </div>
+
+            <div className="flex gap-4 md:gap-8 landscape:gap-2">
               <button
                 onClick={() => handleDecrement(index)}
-                className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center
-                          clip-[polygon(0%_15%,_15%_0%,_85%_0%,_100%_15%,_100%_85%,_85%_100%,_15%_100%,_0%_85%)]
-                          bg-arcane-dark/50 text-arcane-gold/70 border-2 border-arcane-gold/30
-                          hover:bg-arcane-dark hover:border-arcane-gold/70 transition-all duration-200
-                          active:transform active:scale-90"
+                className="player-button"
                 aria-label={`Decrement Player ${index + 1} score`}
               >
-                <Minus size={48} />
+              <Minus className="player-button-icon" />
               </button>
 
               <button
                 onClick={() => handleIncrement(index)}
-                className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center
-                          clip-[polygon(0%_15%,_15%_0%,_85%_0%,_100%_15%,_100%_85%,_85%_100%,_15%_100%,_0%_85%)]
-                          bg-arcane-dark/50 text-arcane-gold/70 border-2 border-arcane-gold/30
-                          hover:bg-arcane-dark hover:border-arcane-gold/70 transition-all duration-200
-                          active:transform active:scale-90"
+                className="player-button"
                 aria-label={`Increment Player ${index + 1} score`}
               >
-                <Plus size={48} />
+              <Plus className="player-button-icon" />
               </button>
+
             </div>
           </div>
         ))}
@@ -168,17 +246,14 @@ return (
                    }`}>
         <button
           onClick={() => setShowSettings(true)}
-          className={`p-3 
-                     bg-arcane-plate 
-                     btn-octagon 
-                     transition-all duration-200
+          className={`settings-button
                      ${isGameInWinningState 
                        ? 'text-hextech-blue' 
                        : 'text-arcane-gold hover:text-hextech-blue'
                      }`}
           aria-label="Open Settings"
         >
-          <Settings size={28} />
+          <Settings className='settings-button-icon' />
         </button>
       </div>
 
@@ -238,6 +313,91 @@ return (
                   Reset Game
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRuneModalFor !== null && (
+        <div 
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowRuneModalFor(null)}
+        >
+          <div 
+            className="bg-arcane-plate rounded-2xl shadow-xl w-full max-w-sm 
+                       border-2 border-arcane-gold/50 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center p-5 border-b border-arcane-gold/20">
+              <h2 className="text-2xl font-bold text-white">Player {showRuneModalFor + 1} Runes</h2>
+              <button
+                onClick={() => setShowRuneModalFor(null)}
+                className="p-2 rounded-lg text-gray-400 hover:bg-arcane-dark hover:text-white"
+                aria-label="Close Rune Selector"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="p-5 landscape:p-1">
+
+              {showRuneModalFor !== null && (() => {
+                const runesForThisPlayer = playerRunes[showRuneModalFor];
+                const canSelect = runesForThisPlayer.length < 2;
+
+                const RuneButton = ({ name }: { name: RuneName }) => {
+                  const isSelected = runesForThisPlayer.includes(name);
+                  return (
+                    <button
+                      onClick={() => handleRuneSelect(name)}
+                      className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg font-arcane text-sm font-bold transition-all duration-200
+                                  w-24 h-24
+                                  border ${RUNE_DATA[name].color}
+                                  ${isSelected
+                                    ? `bg-arcane-gold/20 ${RUNE_DATA[name].borderColor}`
+                                    : 'bg-arcane-dark border-arcane-gold/30 opacity-70 hover:opacity-100'
+                                  }
+                                  ${!isSelected && !canSelect && 'opacity-30 cursor-not-allowed'}
+                                `}
+                    >
+                      <img
+                        src={RUNE_DATA[name].icon}
+                        alt={name}
+                        className={`w-10 h-10 rounded-md transition-all ${isSelected ? RUNE_DATA[name].glow : 'opacity-80'}`}
+                      />
+                      {name}
+                    </button>
+                  );
+                };
+
+                return (
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="flex justify-center gap-3">
+                      <RuneButton name="Fury" />
+                      <RuneButton name="Calm" />
+                    </div>
+                    <div className="flex justify-center gap-3">
+                      <RuneButton name="Body" />
+                      <button
+                        onClick={handleClearRunes}
+                        className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg font-arcane text-sm font-bold transition-all duration-200
+                                    w-24 h-24
+                                    border border-arcane-gold/50 text-arcane-gold/70
+                                    bg-arcane-dark hover:opacity-100 hover:text-arcane-gold hover:border-arcane-gold`}
+                      >
+                        <Ban className="w-10 h-10 opacity-80" />
+                        Clear
+                      </button>
+
+                      <RuneButton name="Order" />
+                    </div>
+                    <div className="flex justify-center gap-3">
+                      <RuneButton name="Mind" />
+                      <RuneButton name="Chaos" />
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
