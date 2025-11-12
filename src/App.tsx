@@ -51,8 +51,6 @@ const RUNE_DATA = {
 
 type RuneName = keyof typeof RUNE_DATA;
 
-const RUNE_NAMES = Object.keys(RUNE_DATA) as RuneName[];
-
 function getFromStorage<T>(key: string, defaultValue: T): T {
   const saved = localStorage.getItem(key);
   if (saved) {
