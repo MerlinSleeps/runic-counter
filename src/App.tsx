@@ -69,8 +69,6 @@ export default function App() {
     getFromStorage('runicCounterScores', [0, 0, 0, 0])
   );
 
-  const isGameInWinningState = scores.some(score => score >= 8);
-
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
   const [playerRunes, setPlayerRunes] = useState<string[][]>([[], [], [], []]);
@@ -78,6 +76,14 @@ export default function App() {
   const [showRuneModalFor, setShowRuneModalFor] = useState<number | null>(null);
 
   const [animationDirections, setAnimationDirections] = useState<number[]>([1, 1, 1, 1]);
+
+  const [gameMode, setGameMode] = useState<'standard' | '2v2'>(() =>
+    getFromStorage('runicCounterGameMode', 'standard')
+  );
+
+  const winScore = gameMode === 'standard' ? 8 : 11;
+  
+  const isGameInWinningState = scores.some(score => score >= winScore);
 
   useEffect(() => {
     localStorage.setItem('runicCounterPlayerCount', JSON.stringify(playerCount));
@@ -87,12 +93,15 @@ export default function App() {
     localStorage.setItem('runicCounterScores', JSON.stringify(scores));
   }, [scores]);
 
+  useEffect(() => {
+    localStorage.setItem('runicCounterGameMode', JSON.stringify(gameMode));
+  }, [gameMode]);
+
   const handleIncrement = (index: number) => {
     setAnimationDirections(prev => prev.map((dir, i) => (i === index ? 1 : dir)));
 
     setScores(prevScores =>
-      prevScores.map((score, i) => (i === index ? Math.min(11, score + 1) : score))
-    );
+      prevScores.map((score, i) => (i === index ? Math.min(winScore, score + 1) : score)));
   };
 
   const handleDecrement = (index: number) => {
@@ -110,6 +119,21 @@ export default function App() {
 
   const handleSetPlayerCount = (count: number) => {
     setPlayerCount(count);
+    handleResetGame();
+    if (count !== 2) {
+      setGameMode('standard');
+    }
+    setShowSettings(false);
+  };
+
+  const handleSetStandardMode = () => {
+    setGameMode('standard');
+    setShowSettings(false);
+  };
+
+  const handleSet2v2Mode = () => {
+    setGameMode('2v2');
+    setPlayerCount(2); // Force 2-player layout
     handleResetGame();
     setShowSettings(false);
   };
@@ -133,7 +157,7 @@ export default function App() {
   const getPlayerClass = (index: number) => {
     let classes = 'relative p-4 bg-transparent border border-arcane-gold/30 transition-all duration-300 h-full';
 
-    if (scores[index] >= 8) {
+    if (scores[index] >= winScore) {
       classes += ' shadow-glow-blue';
     }
 
@@ -204,7 +228,7 @@ export default function App() {
                   className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase
                              hover:text-hextech-blue transition-colors duration-200"
                 >
-                  Player {index + 1}
+                  {gameMode === '2v2' ? 'Team' : 'Player'} {index + 1}
                 </button>
               </div>
 
@@ -216,10 +240,10 @@ export default function App() {
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: animationDirections[index] * -20, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className={`player-score ${score >= 8
-                      ? 'text-hextech-blue text-shadow-glow-blue'
-                      : 'text-arcane-gold text-shadow-glow-gold'
-                    }`}
+                  className={`player-score ${score >= winScore
+                    ? 'text-hextech-blue text-shadow-glow-blue'
+                    : 'text-arcane-gold text-shadow-glow-gold'
+                  }`}
                 >
                   {score}
                 </motion.span>
@@ -261,10 +285,10 @@ export default function App() {
                 </div>
                 <button
                   onClick={() => setShowRuneModalFor(index)}
-                  className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase
+                  className="text-xl md:text-2xl landscape:lg:mt-4 text-arcane-gold/70 tracking-[.2em] uppercase
                              hover:text-hextech-blue transition-colors duration-200"
                 >
-                  Player {index + 1}
+                  {gameMode === '2v2' ? 'Team' : 'Player'} {index + 1}
                 </button>
               </div>
 
@@ -287,10 +311,10 @@ export default function App() {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: animationDirections[index] * -20, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className={`player-score ${score >= 8
-                        ? 'text-hextech-blue text-shadow-glow-blue'
-                        : 'text-arcane-gold text-shadow-glow-gold'
-                      }`}
+                    className={`player-score ${score >= winScore
+                      ? 'text-hextech-blue text-shadow-glow-blue'
+                      : 'text-arcane-gold text-shadow-glow-gold'
+                    }`}
                   >
                     {score}
                   </motion.span>
@@ -350,6 +374,36 @@ export default function App() {
             </div>
 
             <div className="p-5 space-y-6">
+
+              <div>
+                <label className="block text-sm font-arcane text-arcane-gold mb-3">
+                  <Users size={16} className="inline-block mr-2 -mt-1" />
+                  Game Mode
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={handleSetStandardMode}
+                    className={`p-4 rounded-lg font-arcane text-lg transition-all duration-200
+                                  ${gameMode === 'standard'
+                        ? 'bg-arcane-gold text-arcane-dark ring-2 ring-hextech-blue'
+                        : 'bg-arcane-dark text-white hover:bg-arcane-dark/70 border border-arcane-gold/30'
+                      }`}
+                  >
+                    Standard (8)
+                  </button>
+                  <button
+                    onClick={handleSet2v2Mode}
+                    className={`p-4 rounded-lg font-arcane text-lg transition-all duration-200
+                                  ${gameMode === '2v2'
+                        ? 'bg-arcane-gold text-arcane-dark ring-2 ring-hextech-blue'
+                        : 'bg-arcane-dark text-white hover:bg-arcane-dark/70 border border-arcane-gold/30'
+                      }`}
+                  >
+                    2v2 (11)
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-arcane text-arcane-gold mb-3">
                   <Users size={16} className="inline-block mr-2 -mt-1" />
@@ -360,11 +414,16 @@ export default function App() {
                     <button
                       key={count}
                       onClick={() => handleSetPlayerCount(count)}
+                      // --- ADD THIS DISABLED LOGIC ---
+                      disabled={gameMode === '2v2' && count !== 2}
                       className={`p-4 rounded-lg font-arcane text-xl transition-all duration-200
                                   ${playerCount === count
                           ? 'bg-arcane-gold text-arcane-dark ring-2 ring-hextech-blue'
                           : 'bg-arcane-dark text-white hover:bg-arcane-dark/70 border border-arcane-gold/30'
-                        }`}
+                        }
+                                  ${/* --- ADD THIS DISABLED STYLE --- */''}
+                                  ${gameMode === '2v2' && count !== 2 && 'opacity-50 cursor-not-allowed'}
+                                `}
                     >
                       {count}
                     </button>
