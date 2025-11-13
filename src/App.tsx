@@ -17,17 +17,17 @@ const RUNE_DATA = {
     glow: 'drop-shadow-glow-fury',
     icon: 'icons/runes/fury.jpg'
   },
-  'Calm': {
-    color: 'text-rune-calm',
-    borderColor: 'border-rune-calm',
-    glow: 'drop-shadow-glow-calm',
-    icon: 'icons/runes/calm.jpg'
-  },
   'Body': {
     color: 'text-rune-body',
     borderColor: 'border-rune-body',
     glow: 'drop-shadow-glow-body',
     icon: 'icons/runes/body.jpg'
+  },
+  'Calm': {
+    color: 'text-rune-calm',
+    borderColor: 'border-rune-calm',
+    glow: 'drop-shadow-glow-calm',
+    icon: 'icons/runes/calm.jpg'
   },
   'Order': {
     color: 'text-rune-order',
@@ -77,6 +77,8 @@ export default function App() {
 
   const [showRuneModalFor, setShowRuneModalFor] = useState<number | null>(null);
 
+  const [animationDirections, setAnimationDirections] = useState<number[]>([1, 1, 1, 1]);
+
   useEffect(() => {
     localStorage.setItem('runicCounterPlayerCount', JSON.stringify(playerCount));
   }, [playerCount]);
@@ -86,12 +88,15 @@ export default function App() {
   }, [scores]);
   
   const handleIncrement = (index: number) => {
+    setAnimationDirections(prev => prev.map((dir, i) => (i === index ? 1 : dir)));
+
     setScores(prevScores => 
       prevScores.map((score, i) => (i === index ? Math.min(11, score + 1) : score))
     );
   };
 
   const handleDecrement = (index: number) => {
+    setAnimationDirections(prev => prev.map((dir, i) => (i === index ? -1 : dir)));
     setScores(prevScores =>
       prevScores.map((score, i) => (i === index ? Math.max(0, score - 1) : score))
     );
@@ -99,6 +104,7 @@ export default function App() {
 
   const handleResetGame = () => {
     setScores([0, 0, 0, 0]);
+    setAnimationDirections([1, 1, 1, 1]);
     setShowSettings(false);
   };
 
@@ -125,13 +131,13 @@ export default function App() {
 
 
 const getPlayerClass = (index: number) => {
-    let classes = 'relative flex flex-col items-center justify-around p-4 bg-transparent border border-arcane-gold/30 transition-all duration-300';
+    let classes = 'relative p-4 bg-transparent border border-arcane-gold/30 transition-all duration-300 h-full';
     
     if (scores[index] >= 8) {
       classes += ' shadow-glow-blue';
     }
 
-    if (playerCount === 2) {
+    if (playerCount === 2) { 
       if (index === 0) classes += ' rotate-180';
     } else if (playerCount === 3) {
       if (index === 0) classes += ' col-span-2 rotate-180';
@@ -176,61 +182,135 @@ return (
       <div className={`h-full w-full grid ${getGridClass()} gap-1 bg-transparent`}>
         {scores.slice(0, playerCount).map((score, index) => (
           <div key={index} className={getPlayerClass(index)}>
-            
-            <button 
-              onClick={() => setShowRuneModalFor(index)}
-              className="text-xl md:text-2xl lg:text-3xl xl:text-4xl text-arcane-gold/70 tracking-[.2em] uppercase
-                        hover:text-hextech-blue transition-colors duration-200">
-              Player {index + 1}
-            </button>
-            
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={score}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -20, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className={`player-score ${
-                              score >= 8
-                                ? 'text-hextech-blue text-shadow-glow-blue'
-                                : 'text-arcane-gold text-shadow-glow-gold'
-                            }`}
-              >
-                {score}
-              </motion.span>
-            </AnimatePresence>
+          <div className="flex flex-col items-center justify-around h-full landscape:hidden">
+              
+              {/* Top content (Label + Runes) */}
+              <div className="flex flex-col items-center gap-2">
+                
+                {/* 1. Runes (No longer absolute) */}
+                <div className="flex gap-2">
+                  {playerRunes[index].map((runeName) => (
+                    <img
+                      key={runeName}
+                      src={RUNE_DATA[runeName as RuneName].icon}
+                      alt={runeName}
+                      className={`player-rune-icon ${RUNE_DATA[runeName as RuneName].glow}`}
+                    />
+                  ))}
+                </div>
+                
+                {/* 2. Player Label */}
+                <button 
+                  onClick={() => setShowRuneModalFor(index)}
+                  className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase
+                             hover:text-hextech-blue transition-colors duration-200"
+                >
+                  Player {index + 1}
+                </button>
+              </div>
 
-            <div className="absolute top-4 left-4 flex gap-2">
-              {playerRunes[index].map((runeName) => (
-                <img
-                  key={runeName}
-                  src={RUNE_DATA[runeName as RuneName].icon}
-                  alt={runeName}
-                  className={`player-rune-icon ${RUNE_DATA[runeName as RuneName].glow}`}
-                />
-              ))}
+              {/* Score (Center) */}
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={score}
+                  initial={{ y: animationDirections[index] * 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: animationDirections[index] * -20, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className={`player-score ${
+                      score >= 8
+                        ? 'text-hextech-blue text-shadow-glow-blue'
+                        : 'text-arcane-gold text-shadow-glow-gold'
+                    }`}
+                >
+                  {score}
+                </motion.span>
+              </AnimatePresence>
+
+              {/* Buttons (Bottom) */}
+              <div className="flex gap-4 md:gap-8">
+                <button
+                  onClick={() => handleDecrement(index)}
+                  className="player-button"
+                  aria-label={`Decrement Player ${index + 1} score`}
+                >
+                  <Minus className="player-button-icon" />
+                </button>
+                <button
+                  onClick={() => handleIncrement(index)}
+                  className="player-button"
+                  aria-label={`Increment Player ${index + 1} score`}
+                >
+                  <Plus className="player-button-icon" />
+                </button>
+              </div>
             </div>
 
-            <div className="flex gap-4 md:gap-8 landscape:gap-2">
-              <button
-                onClick={() => handleDecrement(index)}
-                className="player-button"
-                aria-label={`Decrement Player ${index + 1} score`}
-              >
-              <Minus className="player-button-icon" />
-              </button>
+            {/* --- 2. LANDSCAPE LAYOUT (Per your request) --- */}
+            {/* This is hidden by default, but becomes a flex container in landscape */}
+            <div className="hidden landscape:flex flex-col justify-start h-full w-full">
+              
+              {/* TOP PART: Label and Runes */}
+              <div className="relative w-full text-center">
+                <div className="absolute top-0 left-0 flex gap-2">
+                  {playerRunes[index].map((runeName) => (
+                    <img
+                      key={runeName}
+                      src={RUNE_DATA[runeName as RuneName].icon}
+                      alt={runeName}
+                      className={`player-rune-icon ${RUNE_DATA[runeName as RuneName].glow}`}
+                    />
+                  ))}
+                </div>
+                <button 
+                  onClick={() => setShowRuneModalFor(index)}
+                  className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase
+                             hover:text-hextech-blue transition-colors duration-200"
+                >
+                  Player {index + 1}
+                </button>
+              </div>
 
-              <button
-                onClick={() => handleIncrement(index)}
-                className="player-button"
-                aria-label={`Increment Player ${index + 1} score`}
-              >
-              <Plus className="player-button-icon" />
-              </button>
+              {/* BOTTOM PART: [Button] [Score] [Button] */}
+              <div className="flex flex-row items-center justify-evenly h-full w-full">
+                {/* Decrement Button */}
+                <button
+                  onClick={() => handleDecrement(index)}
+                  className="player-button"
+                  aria-label={`Decrement Player ${index + 1} score`}
+                >
+                  <Minus className="player-button-icon" />
+                </button>
 
+                {/* Score (Center) */}
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={score}
+                    initial={{ y: animationDirections[index] * 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: animationDirections[index] * -20, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className={`player-score ${
+                        score >= 8
+                          ? 'text-hextech-blue text-shadow-glow-blue'
+                          : 'text-arcane-gold text-shadow-glow-gold'
+                      }`}
+                  >
+                    {score}
+                  </motion.span>
+                </AnimatePresence>
+
+                {/* Increment Button */}
+                <button
+                  onClick={() => handleIncrement(index)}
+                  className="player-button"
+                  aria-label={`Increment Player ${index + 1} score`}
+                >
+                  <Plus className="player-button-icon" />
+                </button>
+              </div>
+              </div>
             </div>
-          </div>
         ))}
       </div>
 
@@ -374,10 +454,10 @@ return (
                   <div className="flex flex-col items-center gap-3">
                     <div className="flex justify-center gap-3">
                       <RuneButton name="Fury" />
-                      <RuneButton name="Calm" />
+                      <RuneButton name="Body" />
                     </div>
                     <div className="flex justify-center gap-3">
-                      <RuneButton name="Body" />
+                      <RuneButton name="Chaos" />
                       <button
                         onClick={handleClearRunes}
                         className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg font-arcane text-sm font-bold transition-all duration-200
@@ -393,7 +473,7 @@ return (
                     </div>
                     <div className="flex justify-center gap-3">
                       <RuneButton name="Mind" />
-                      <RuneButton name="Chaos" />
+                      <RuneButton name="Calm" />
                     </div>
                   </div>
                 );
