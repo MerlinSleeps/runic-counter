@@ -179,7 +179,7 @@ return (
             
             <button 
               onClick={() => setShowRuneModalFor(index)}
-              className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase
+              className="text-xl md:text-2xl lg:text-3xl xl:text-4xl text-arcane-gold/70 tracking-[.2em] uppercase
                         hover:text-hextech-blue transition-colors duration-200">
               Player {index + 1}
             </button>

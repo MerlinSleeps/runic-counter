@@ -16,27 +16,22 @@
   background-color: #0A1428;
   background-image: radial-gradient(circle at center, #1A2E4F 30%, #0A1428 100%);
 }
-  /* --- 1. Player Score Text --- */
   .player-score {
     @apply font-arcane font-black transition-all duration-300
-    /* Default (Small Phone) */
-    text-6xl
-    /* Small Phone - Landscape */
-    landscape:text-5xl
-    /* Tablet (md) & up */
-    md:text-8xl
-    lg:text-9xl
-    landscape:lg:text-8xl;
+    text-8xl
+    landscape:text-6xl
+    landscape:lg:text-8xl
+    landscape:xl:text-9xl
+    portrait:text-9xl
+    portrait:md:text-9xl
+    portrait:lg:text-9xl
+    portrait:xl:text-9xl;
   }
 
   .player-button {
-    /* Default (Small Phone) */
     @apply w-12 h-12
-    /* Small Phone - Landscape */
     landscape:w-16 landscape:h-16 
-    /* Tablet (md) & up */
     md:w-20 md:h-20 md:border-2
-    /* Desktop (lg) & up */
     lg:w-32 lg:h-32
     landscape:lg:w-32 landscape:lg:h-20
     landscape:lg:border-4
@@ -79,7 +74,7 @@
 
   @media (max-height: 450px) {
   .player-score {
-    @apply text-5xl;
+    @apply text-6xl;
   }
   .player-button {
     @apply w-14 h-14 border-0;
