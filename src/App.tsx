@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Plus, 
-  Minus, 
-  Settings, 
-  X, 
-  Users, 
+import {
+  Plus,
+  Minus,
+  Settings,
+  X,
+  Users,
   RefreshCw,
-  Ban 
+  Ban
 } from 'lucide-react';
 
 const RUNE_DATA = {
@@ -61,14 +61,14 @@ function getFromStorage<T>(key: string, defaultValue: T): T {
 
 export default function App() {
 
-  const [playerCount, setPlayerCount] = useState<number>(() => 
+  const [playerCount, setPlayerCount] = useState<number>(() =>
     getFromStorage('runicCounterPlayerCount', 2)
   );
-  
-  const [scores, setScores] = useState<number[]>(() => 
+
+  const [scores, setScores] = useState<number[]>(() =>
     getFromStorage('runicCounterScores', [0, 0, 0, 0])
   );
-  
+
   const isGameInWinningState = scores.some(score => score >= 8);
 
   const [showSettings, setShowSettings] = useState<boolean>(false);
@@ -86,11 +86,11 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('runicCounterScores', JSON.stringify(scores));
   }, [scores]);
-  
+
   const handleIncrement = (index: number) => {
     setAnimationDirections(prev => prev.map((dir, i) => (i === index ? 1 : dir)));
 
-    setScores(prevScores => 
+    setScores(prevScores =>
       prevScores.map((score, i) => (i === index ? Math.min(11, score + 1) : score))
     );
   };
@@ -130,14 +130,14 @@ export default function App() {
   };
 
 
-const getPlayerClass = (index: number) => {
+  const getPlayerClass = (index: number) => {
     let classes = 'relative p-4 bg-transparent border border-arcane-gold/30 transition-all duration-300 h-full';
-    
+
     if (scores[index] >= 8) {
       classes += ' shadow-glow-blue';
     }
 
-    if (playerCount === 2) { 
+    if (playerCount === 2) {
       if (index === 0) classes += ' rotate-180';
     } else if (playerCount === 3) {
       if (index === 0) classes += ' col-span-2 rotate-180';
@@ -145,7 +145,7 @@ const getPlayerClass = (index: number) => {
       if (index === 0) classes += ' rotate-180';
       if (index === 1) classes += ' rotate-180';
     }
-    
+
     return classes;
   };
 
@@ -177,17 +177,16 @@ const getPlayerClass = (index: number) => {
     });
   };
 
-return (
-  <main className="fixed inset-0 text-arcane-gold font-arcane select-none bg-gradient-arcane">
+  return (
+    <main className="fixed inset-0 text-arcane-gold font-arcane select-none bg-gradient-arcane">
       <div className={`h-full w-full grid ${getGridClass()} gap-1 bg-transparent`}>
         {scores.slice(0, playerCount).map((score, index) => (
           <div key={index} className={getPlayerClass(index)}>
-          <div className="flex flex-col items-center justify-around h-full landscape:hidden">
-              
+            <div className="flex flex-col items-center justify-around h-full landscape:hidden">
+
               {/* Top content (Label + Runes) */}
               <div className="flex flex-col items-center gap-2">
-                
-                {/* 1. Runes (No longer absolute) */}
+                {/*  Runes */}
                 <div className="flex gap-2">
                   {playerRunes[index].map((runeName) => (
                     <img
@@ -198,9 +197,9 @@ return (
                     />
                   ))}
                 </div>
-                
-                {/* 2. Player Label */}
-                <button 
+
+                {/* Player Label */}
+                <button
                   onClick={() => setShowRuneModalFor(index)}
                   className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase
                              hover:text-hextech-blue transition-colors duration-200"
@@ -217,10 +216,9 @@ return (
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: animationDirections[index] * -20, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className={`player-score ${
-                      score >= 8
-                        ? 'text-hextech-blue text-shadow-glow-blue'
-                        : 'text-arcane-gold text-shadow-glow-gold'
+                  className={`player-score ${score >= 8
+                      ? 'text-hextech-blue text-shadow-glow-blue'
+                      : 'text-arcane-gold text-shadow-glow-gold'
                     }`}
                 >
                   {score}
@@ -246,10 +244,9 @@ return (
               </div>
             </div>
 
-            {/* --- 2. LANDSCAPE LAYOUT (Per your request) --- */}
-            {/* This is hidden by default, but becomes a flex container in landscape */}
+            {/* --- 2. LANDSCAPE LAYOUT --- */}
             <div className="hidden landscape:flex flex-col justify-start h-full w-full">
-              
+
               {/* TOP PART: Label and Runes */}
               <div className="relative w-full text-center">
                 <div className="absolute top-0 left-0 flex gap-2">
@@ -262,7 +259,7 @@ return (
                     />
                   ))}
                 </div>
-                <button 
+                <button
                   onClick={() => setShowRuneModalFor(index)}
                   className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase
                              hover:text-hextech-blue transition-colors duration-200"
@@ -290,17 +287,15 @@ return (
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: animationDirections[index] * -20, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className={`player-score ${
-                        score >= 8
-                          ? 'text-hextech-blue text-shadow-glow-blue'
-                          : 'text-arcane-gold text-shadow-glow-gold'
+                    className={`player-score ${score >= 8
+                        ? 'text-hextech-blue text-shadow-glow-blue'
+                        : 'text-arcane-gold text-shadow-glow-gold'
                       }`}
                   >
                     {score}
                   </motion.span>
                 </AnimatePresence>
 
-                {/* Increment Button */}
                 <button
                   onClick={() => handleIncrement(index)}
                   className="player-button"
@@ -309,8 +304,8 @@ return (
                   <Plus className="player-button-icon" />
                 </button>
               </div>
-              </div>
             </div>
+          </div>
         ))}
       </div>
 
@@ -320,17 +315,17 @@ return (
                    p-0.5 
                    btn-octagon 
                    transition-all duration-200 z-10
-                   ${isGameInWinningState 
-                     ? 'bg-hextech-blue shadow-glow-blue' 
-                     : 'bg-arcane-gold shadow-glow-gold hover:bg-hextech-blue hover:shadow-glow-blue'
-                   }`}>
+                   ${isGameInWinningState
+            ? 'bg-hextech-blue shadow-glow-blue'
+            : 'bg-arcane-gold shadow-glow-gold hover:bg-hextech-blue hover:shadow-glow-blue'
+          }`}>
         <button
           onClick={() => setShowSettings(true)}
           className={`settings-button
-                     ${isGameInWinningState 
-                       ? 'text-hextech-blue' 
-                       : 'text-arcane-gold hover:text-hextech-blue'
-                     }`}
+                     ${isGameInWinningState
+              ? 'text-hextech-blue'
+              : 'text-arcane-gold hover:text-hextech-blue'
+            }`}
           aria-label="Open Settings"
         >
           <Settings className='settings-button-icon' />
@@ -339,12 +334,12 @@ return (
 
       {showSettings && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div 
+          <div
             className="bg-arcane-plate rounded-2xl shadow-xl w-full max-w-sm 
                        border-2 border-arcane-gold/50 overflow-hidden"
           >
             <div className="flex justify-between items-center p-5 border-b border-arcane-gold/20">
-              <h2 className="text-2xl font-bold text-white">Settings</h2>
+              <h2 className="text-2xl font-arcane text-white">Settings</h2>
               <button
                 onClick={() => setShowSettings(false)}
                 className="p-2 rounded-lg text-gray-400 hover:bg-arcane-dark hover:text-white"
@@ -356,7 +351,7 @@ return (
 
             <div className="p-5 space-y-6">
               <div>
-                <label className="block text-sm font-medium text-arcane-gold mb-3">
+                <label className="block text-sm font-arcane text-arcane-gold mb-3">
                   <Users size={16} className="inline-block mr-2 -mt-1" />
                   Select Players
                 </label>
@@ -365,12 +360,11 @@ return (
                     <button
                       key={count}
                       onClick={() => handleSetPlayerCount(count)}
-                      className={`p-4 rounded-lg font-bold text-xl transition-all duration-200
-                                  ${
-                                    playerCount === count
-                                      ? 'bg-arcane-gold text-arcane-dark ring-2 ring-hextech-blue'
-                                      : 'bg-arcane-dark text-white hover:bg-arcane-dark/70 border border-arcane-gold/30'
-                                  }`}
+                      className={`p-4 rounded-lg font-arcane text-xl transition-all duration-200
+                                  ${playerCount === count
+                          ? 'bg-arcane-gold text-arcane-dark ring-2 ring-hextech-blue'
+                          : 'bg-arcane-dark text-white hover:bg-arcane-dark/70 border border-arcane-gold/30'
+                        }`}
                     >
                       {count}
                     </button>
@@ -379,14 +373,14 @@ return (
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-red-500 mb-3">
+                <label className="block text-sm font-arcane text-red-500 mb-3">
                   <RefreshCw size={16} className="inline-block mr-2 -mt-1" />
                   Game Actions
                 </label>
                 <button
                   onClick={handleResetGame}
                   className="w-full flex items-center justify-center gap-2 p-4 rounded-lg 
-                             bg-red-600/90 text-white font-bold text-lg
+                             bg-red-600/90 text-white font-arcane text-lg
                              hover:bg-red-500 transition-all duration-200"
                 >
                   <RefreshCw size={20} />
@@ -399,11 +393,11 @@ return (
       )}
 
       {showRuneModalFor !== null && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
           onClick={() => setShowRuneModalFor(null)}
         >
-          <div 
+          <div
             className="bg-arcane-plate rounded-2xl shadow-xl w-full max-w-sm 
                        border-2 border-arcane-gold/50 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
@@ -434,9 +428,9 @@ return (
                                   w-24 h-24
                                   border ${RUNE_DATA[name].color}
                                   ${isSelected
-                                    ? `bg-arcane-gold/20 ${RUNE_DATA[name].borderColor}`
-                                    : 'bg-arcane-dark border-arcane-gold/30 opacity-70 hover:opacity-100'
-                                  }
+                          ? `bg-arcane-gold/20 ${RUNE_DATA[name].borderColor}`
+                          : 'bg-arcane-dark border-arcane-gold/30 opacity-70 hover:opacity-100'
+                        }
                                   ${!isSelected && !canSelect && 'opacity-30 cursor-not-allowed'}
                                 `}
                     >
