@@ -128,7 +128,6 @@ export default function App() {
 
   const handleSetStandardMode = () => {
     setGameMode('standard');
-    setShowSettings(false);
   };
 
   const handleSet2v2Mode = () => {
@@ -233,7 +232,7 @@ export default function App() {
               </div>
 
               {/* Score (Center) */}
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="popLayout">
                 <motion.span
                   key={score}
                   initial={{ y: animationDirections[index] * 20, opacity: 0 }}
@@ -304,7 +303,7 @@ export default function App() {
                 </button>
 
                 {/* Score (Center) */}
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="popLayout">
                   <motion.span
                     key={score}
                     initial={{ y: animationDirections[index] * 20, opacity: 0 }}
