@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/', // <--- THIS IS THE KEY FIX
+  base: '/',
   plugins: [
     react(),
     VitePWA({
@@ -12,7 +12,7 @@ export default defineConfig({
       manifest: {
         name: 'Runic Counter',
         short_name: 'Runic Counter',
-        start_url: '/', // <--- AND THIS
+        start_url: '/',
         display: 'standalone',
         background_color: '#0A1428',
         theme_color: '#0A1428',
