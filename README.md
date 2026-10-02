@@ -28,7 +28,7 @@ Runic Counter is my answer to that: a single-screen app you put in the middle of
 - **Victory state:** when a player reaches the target, their score and panel switch from gold to a glowing Hextech blue, and so does the central settings button.
 - **Domain display:** tap a player's name to choose up to two of the six domains (Fury, Calm, Mind, Body, Chaos, Order). They appear as glowing icons in that player's panel.
 - **Animated score changes** with Framer Motion. The number slides up or down depending on the direction.
-- **Persistent state:** scores, player count and game mode are stored in `localStorage` and survive reloads.
+- **Persistent state:** scores, player count, game mode and each player's domains are stored in `localStorage` and survive reloads.
 - **Installable PWA:** add it to the home screen and it runs fullscreen and offline (service worker via `vite-plugin-pwa`).
 
 | 2 players | Victory | 3 players |
@@ -71,7 +71,6 @@ The app is served under the `/runic-counter/` base path (see `vite.config.ts`) t
 ## Roadmap
 
 - [ ] Android release via Capacitor
-- [ ] Remember each player's domains across reloads
 - [ ] Optional player names
 - [ ] Undo for accidental taps
 - [ ] Split the main component into smaller components and add unit tests for the scoring logic

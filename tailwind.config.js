@@ -14,12 +14,12 @@ export default {
         'arcane-gold': '#C89B3C',
         'hextech-blue': '#00BFFF',
 
-        'rune-fury': '#DC2626',   // Red
-        'rune-calm': '#16A34A',   // Green
-        'rune-body': '#D97706',   // Orange
-        'rune-order': '#EAB308',  // Yellow
-        'rune-mind': '#2563EB',   // Blue
-        'rune-chaos': '#9333EA',  // Purple
+        'rune-fury': '#DC2626',
+        'rune-calm': '#16A34A',
+        'rune-body': '#D97706',
+        'rune-order': '#EAB308',
+        'rune-mind': '#2563EB',
+        'rune-chaos': '#9333EA',
       },
       dropShadow: {
         'glow-fury': '0 0 8px rgba(220, 38, 38, 0.7)',
@@ -34,12 +34,12 @@ export default {
         numeric: ['Arcane Nine', 'serif']
       },
       textShadow: {
-        'glow-blue': '0 0 10px #00BFFF, 0 0 20px #00BFFF', // font-blue
-        'glow-gold': '0 0 8px #C89B3C', // font-gold
+        'glow-blue': '0 0 10px #00BFFF, 0 0 20px #00BFFF',
+        'glow-gold': '0 0 8px #C89B3C',
       },
       boxShadow: {
-        'glow-blue': '0 0 20px 8px rgba(0, 191, 255, 0.4)', // hextech-blue
-        'glow-gold': '0 0 15px 5px rgba(200, 155, 60, 0.3)', // arcane-gold
+        'glow-blue': '0 0 20px 8px rgba(0, 191, 255, 0.4)',
+        'glow-gold': '0 0 15px 5px rgba(200, 155, 60, 0.3)',
       },
       backgroundImage: {
         'gradient-arcane': 'radial-gradient(circle at center, #0A1428 70%, #000000 100%)',

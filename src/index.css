@@ -23,28 +23,21 @@ body {
 
 .player-score {
     @apply font-arcane font-black transition-all duration-300 -mt-4
-           /* --- Default (Portrait Small) --- */
            text-[8rem]
-           /* --- Portrait Breakpoints --- */
            portrait:md:text-[12rem]
            portrait:lg:text-[14rem]
            portrait:xl:text-[20rem]
-           /* --- Landscape Breakpoints --- */
            landscape:text-[10rem]
            landscape:md:text-[12rem]
            landscape:lg:text-[14rem];
   }
 
   .player-button {
-    @apply /* --- Default (Portrait Small) --- */
-           w-12 h-12 border-2
-           /* --- Portrait Breakpoints --- */
+    @apply w-12 h-12 border-2
            md:w-20 md:h-20 md:border-2
            lg:w-32 lg:h-32
-           /* --- Landscape Breakpoints --- */
            landscape:w-16 landscape:h-16 landscape:border-0
            landscape:lg:w-20 landscape:lg:h-20 landscape:lg:border-4
-           /* --- Shared Styles --- */
            flex items-center justify-center
            bg-transparent text-arcane-gold/80 border-arcane-gold/30
            hover:text-hextech-blue hover:border-arcane-gold/70 transition-all duration-200
@@ -52,41 +45,30 @@ body {
   }
 
 .player-button-icon {
-    @apply /* --- Default (Portrait Small) --- */
-           w-12 h-12
-           /* --- Portrait Breakpoints --- */
+    @apply w-12 h-12
            md:w-12 md:h-12
-           /* --- Landscape Breakpoints --- */
            landscape:w-7 landscape:h-7
            landscape:md:w-9 landscape:md:h-9
            landscape:lg:w-12 landscape:lg:h-12;
 }
 
 .settings-button {
-    @apply /* --- Default --- */
-           p-2
-           /* --- Breakpoints --- */
+    @apply p-2
            md:p-2.5
            lg:p-3
            xl:p-4
-           /* --- Shared Styles --- */
            bg-arcane-plate btn-octagon transition-all duration-200;
 }
 
 .settings-icon {
-    @apply /* --- Default --- */
-           w-5 h-5
-           /* --- Breakpoints --- */
+    @apply w-5 h-5
            md:w-7 md:h-7;
 }
 
 .player-rune-icon {
-    @apply /* --- Default (Portrait Small) --- */
-           w-6 h-6 rounded-md
-           /* --- Portrait Breakpoints --- */
+    @apply w-6 h-6 rounded-md
            md:w-8 md:h-8
            lg:w-10 lg:h-10
-           /* --- Landscape Breakpoints --- */
            landscape:w-7 landscape:h-7
            landscape:md:w-10 landscape:md:h-10
            landscape:lg:w-12 landscape:lg:h-12;

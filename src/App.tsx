@@ -51,34 +51,55 @@ const RUNE_DATA = {
 
 type RuneName = keyof typeof RUNE_DATA;
 
+const STORAGE_KEYS = {
+  playerCount: 'runicCounterPlayerCount',
+  scores: 'runicCounterScores',
+  gameMode: 'runicCounterGameMode',
+  playerRunes: 'runicCounterPlayerRunes',
+} as const;
+
 function getFromStorage<T>(key: string, defaultValue: T): T {
-  const saved = localStorage.getItem(key);
-  if (saved) {
-    return JSON.parse(saved) as T;
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? (JSON.parse(saved) as T) : defaultValue;
+  } catch {
+    return defaultValue;
   }
-  return defaultValue;
+}
+
+function isRuneName(value: unknown): value is RuneName {
+  return typeof value === 'string' && value in RUNE_DATA;
+}
+
+/** Loads the saved runes and drops anything that is not a known rune, e.g. from an older app version. */
+function loadPlayerRunes(): RuneName[][] {
+  const saved = getFromStorage<unknown>(STORAGE_KEYS.playerRunes, null);
+  return [0, 1, 2, 3].map((index) => {
+    const runes = Array.isArray(saved) ? saved[index] : null;
+    return Array.isArray(runes) ? runes.filter(isRuneName).slice(0, 2) : [];
+  });
 }
 
 export default function App() {
 
   const [playerCount, setPlayerCount] = useState<number>(() =>
-    getFromStorage('runicCounterPlayerCount', 2)
+    getFromStorage(STORAGE_KEYS.playerCount, 2)
   );
 
   const [scores, setScores] = useState<number[]>(() =>
-    getFromStorage('runicCounterScores', [0, 0, 0, 0])
+    getFromStorage(STORAGE_KEYS.scores, [0, 0, 0, 0])
   );
 
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
-  const [playerRunes, setPlayerRunes] = useState<string[][]>([[], [], [], []]);
+  const [playerRunes, setPlayerRunes] = useState<RuneName[][]>(loadPlayerRunes);
 
   const [showRuneModalFor, setShowRuneModalFor] = useState<number | null>(null);
 
   const [animationDirections, setAnimationDirections] = useState<number[]>([1, 1, 1, 1]);
 
   const [gameMode, setGameMode] = useState<'standard' | '2v2'>(() =>
-    getFromStorage('runicCounterGameMode', 'standard')
+    getFromStorage(STORAGE_KEYS.gameMode, 'standard')
   );
 
   const winScore = gameMode === 'standard' ? 8 : 11;
@@ -86,16 +107,20 @@ export default function App() {
   const isGameInWinningState = scores.some(score => score >= winScore);
 
   useEffect(() => {
-    localStorage.setItem('runicCounterPlayerCount', JSON.stringify(playerCount));
+    localStorage.setItem(STORAGE_KEYS.playerCount, JSON.stringify(playerCount));
   }, [playerCount]);
 
   useEffect(() => {
-    localStorage.setItem('runicCounterScores', JSON.stringify(scores));
+    localStorage.setItem(STORAGE_KEYS.scores, JSON.stringify(scores));
   }, [scores]);
 
   useEffect(() => {
-    localStorage.setItem('runicCounterGameMode', JSON.stringify(gameMode));
+    localStorage.setItem(STORAGE_KEYS.gameMode, JSON.stringify(gameMode));
   }, [gameMode]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.playerRunes, JSON.stringify(playerRunes));
+  }, [playerRunes]);
 
   const handleIncrement = (index: number) => {
     setAnimationDirections(prev => prev.map((dir, i) => (i === index ? 1 : dir)));
@@ -132,7 +157,7 @@ export default function App() {
 
   const handleSet2v2Mode = () => {
     setGameMode('2v2');
-    setPlayerCount(2); // Force 2-player layout
+    setPlayerCount(2);
     handleResetGame();
     setShowSettings(false);
   };
@@ -207,21 +232,18 @@ export default function App() {
           <div key={index} className={getPlayerClass(index)}>
             <div className="flex flex-col items-center justify-around h-full landscape:hidden">
 
-              {/* Top content (Label + Runes) */}
               <div className="flex flex-col items-center gap-2">
-                {/*  Runes */}
                 <div className="flex gap-2">
                   {playerRunes[index].map((runeName) => (
                     <img
                       key={runeName}
-                      src={RUNE_DATA[runeName as RuneName].icon}
+                      src={RUNE_DATA[runeName].icon}
                       alt={runeName}
-                      className={`player-rune-icon ${RUNE_DATA[runeName as RuneName].glow}`}
+                      className={`player-rune-icon ${RUNE_DATA[runeName].glow}`}
                     />
                   ))}
                 </div>
 
-                {/* Player Label */}
                 <button
                   onClick={() => setShowRuneModalFor(index)}
                   className="text-xl md:text-2xl text-arcane-gold/70 tracking-[.2em] uppercase
@@ -231,7 +253,6 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Score (Center) */}
               <AnimatePresence mode="popLayout">
                 <motion.span
                   key={score}
@@ -248,7 +269,6 @@ export default function App() {
                 </motion.span>
               </AnimatePresence>
 
-              {/* Buttons (Bottom) */}
               <div className="flex gap-4 md:gap-8">
                 <button
                   onClick={() => handleDecrement(index)}
@@ -267,18 +287,16 @@ export default function App() {
               </div>
             </div>
 
-            {/* --- 2. LANDSCAPE LAYOUT --- */}
             <div className="hidden landscape:flex flex-col justify-start h-full w-full">
 
-              {/* TOP PART: Label and Runes */}
               <div className="relative w-full text-center">
                 <div className="absolute top-0 left-0 flex gap-2">
                   {playerRunes[index].map((runeName) => (
                     <img
                       key={runeName}
-                      src={RUNE_DATA[runeName as RuneName].icon}
+                      src={RUNE_DATA[runeName].icon}
                       alt={runeName}
-                      className={`player-rune-icon ${RUNE_DATA[runeName as RuneName].glow}`}
+                      className={`player-rune-icon ${RUNE_DATA[runeName].glow}`}
                     />
                   ))}
                 </div>
@@ -291,9 +309,7 @@ export default function App() {
                 </button>
               </div>
 
-              {/* BOTTOM PART: [Button] [Score] [Button] */}
               <div className="flex flex-row items-center justify-evenly h-full w-full">
-                {/* Decrement Button */}
                 <button
                   onClick={() => handleDecrement(index)}
                   className="player-button"
@@ -302,7 +318,6 @@ export default function App() {
                   <Minus className="player-button-icon" />
                 </button>
 
-                {/* Score (Center) */}
                 <AnimatePresence mode="popLayout">
                   <motion.span
                     key={score}
@@ -413,15 +428,13 @@ export default function App() {
                     <button
                       key={count}
                       onClick={() => handleSetPlayerCount(count)}
-                      // --- ADD THIS DISABLED LOGIC ---
                       disabled={gameMode === '2v2' && count !== 2}
                       className={`p-4 rounded-lg font-arcane text-xl transition-all duration-200
                                   ${playerCount === count
                           ? 'bg-arcane-gold text-arcane-dark ring-2 ring-hextech-blue'
                           : 'bg-arcane-dark text-white hover:bg-arcane-dark/70 border border-arcane-gold/30'
                         }
-                                  ${/* --- ADD THIS DISABLED STYLE --- */''}
-                                  ${gameMode === '2v2' && count !== 2 && 'opacity-50 cursor-not-allowed'}
+                                  ${gameMode === '2v2' && count !== 2 ? 'opacity-50 cursor-not-allowed' : ''}
                                 `}
                     >
                       {count}
@@ -489,7 +502,7 @@ export default function App() {
                           ? `bg-arcane-gold/20 ${RUNE_DATA[name].borderColor}`
                           : 'bg-arcane-dark border-arcane-gold/30 opacity-70 hover:opacity-100'
                         }
-                                  ${!isSelected && !canSelect && 'opacity-30 cursor-not-allowed'}
+                                  ${!isSelected && !canSelect ? 'opacity-30 cursor-not-allowed' : ''}
                                 `}
                     >
                       <img
